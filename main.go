@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "photo.share/pkg"
 
+func main() {
+	pkg.Run()
 }
