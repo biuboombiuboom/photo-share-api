@@ -11,10 +11,33 @@ import (
 	"photo.share/pkg/service"
 )
 
-var phtotPath = "d:/"
+var phtotPath = "d:\\"
 
 func getPhotosByUserId(c *gin.Context) {
 
+}
+
+func uploadPhoto(c *gin.Context) {
+	var userId int64
+	if user, ok := c.Get(claimsKey); !ok {
+		c.String(500, "请登录")
+		c.Abort()
+	} else {
+		userId = user.(Claims).Id
+	}
+
+	photo, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(500, gin.H{"result": err})
+		c.Abort()
+	}
+
+	dst := path.Join(phtotPath, fmt.Sprintf("%d", userId), photo.Filename)
+	err = c.SaveUploadedFile(photo, dst)
+	if err != nil {
+		c.JSON(500, gin.H{"result": err})
+	}
+	c.JSON(200, gin.H{"result": dst})
 }
 
 func newPhoto(c *gin.Context) {
@@ -23,10 +46,10 @@ func newPhoto(c *gin.Context) {
 		c.String(500, "请登录")
 		c.Abort()
 	} else {
-		userId = user.(*Claims).Id
+		userId = user.(Claims).Id
 	}
 
-	photo, _ := c.FormFile("photo")
+	photo, _ := c.FormFile("file")
 
 	dst := path.Join(phtotPath, fmt.Sprintf("%d", userId), photo.Filename)
 	err := c.SaveUploadedFile(photo, dst)

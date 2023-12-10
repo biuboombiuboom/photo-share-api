@@ -19,5 +19,4 @@ func NewPhoto(ctx context.Context, photoInfo model.Photo) (model.Photo, error) {
 
 	photoInfo.Id, _ = result.LastInsertId()
 	return photoInfo, nil
-
 }

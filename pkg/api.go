@@ -23,5 +23,6 @@ func Run() {
 	api.GET("/user/info", authMiddleware, getUserInfo)
 	api.GET("/user/:id/photos", authMiddleware, getPhotosByUserId)
 	api.POST("/photo", authMiddleware, newPhoto)
+	api.POST("/photo/upload", authMiddleware, uploadPhoto)
 	r.Run()
 }
