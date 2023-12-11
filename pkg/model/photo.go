@@ -7,9 +7,18 @@ type Photo struct {
 	UserId      int64     `json:"userId"`
 	Path        string    `json:"path"`
 	CreatedAt   time.Time `json:"createdAt"`
-	Star        int64     `json:"star"`
 	Description string    `json:"description"`
 	Title       string    `json:"title:"`
 	IsPublic    bool      `json:"isPublic"`
 	MD5         string    `json:"md5"`
+}
+
+type PhotoDTO struct {
+	Id          int64  `json:"id"`
+	UserId      int64  `json:"userId"`
+	Path        string `json:"path"`
+	Title       string `json:"tile"`
+	Description string `json:"description"`
+	IsPublic    bool   `json:"isPublic"`
+	Star        int64  `json:"start"`
 }

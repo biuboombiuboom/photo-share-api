@@ -26,3 +26,16 @@ func Run() {
 	api.POST("/photo/upload", authMiddleware, uploadPhoto)
 	r.Run()
 }
+
+func getUserId(c *gin.Context) (int64, bool) {
+	var userId int64
+	found := false
+	if user, ok := c.Get(claimsKey); !ok {
+		c.String(500, "请登录")
+		c.Abort()
+	} else {
+		userId = user.(Claims).Id
+		found = true
+	}
+	return userId, found
+}

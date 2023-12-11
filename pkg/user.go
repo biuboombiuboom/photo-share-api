@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -75,13 +74,11 @@ func register(c *gin.Context) {
 
 func authMiddleware(c *gin.Context) {
 	tokenString := c.GetHeader("Access-Token")
-	fmt.Println(tokenString)
 	if tokenString == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not found auth header"})
 		c.Abort()
 		return
 	}
-
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
