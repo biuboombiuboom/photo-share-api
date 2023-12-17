@@ -8,12 +8,16 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"photo.share/pkg/model"
 	"photo.share/pkg/service"
 )
 
 // var phtotPath = "d:\\"
-var photoPath = "E:\\workspace\\node\\photo-share\\src\\assets\\photo"
+var photoPath = "G:/workspace/node/photo-share-web/public/photo"
+var viewPath = "/photo"
+
+// var photoPath = "E:\\workspace\\node\\photo-share\\src\\assets\\photo"
 
 func getPhotosByUserId(c *gin.Context) {
 	if userId, found := getUserId(c); found {
@@ -60,8 +64,9 @@ func newPhoto(c *gin.Context) {
 	}
 
 	photo, _ := c.FormFile("file")
-
-	dst := path.Join(photoPath, fmt.Sprintf("%d", userId), photo.Filename)
+	newPhotoName := uuid.NewString() + path.Ext(photo.Filename)
+	dst := path.Join(photoPath, fmt.Sprintf("%d", userId), newPhotoName)
+	htmpPath := path.Join(viewPath, fmt.Sprintf("%d", userId), newPhotoName)
 	err := c.SaveUploadedFile(photo, dst)
 	if err != nil {
 		c.String(500, err.Error())
@@ -70,12 +75,13 @@ func newPhoto(c *gin.Context) {
 	}
 
 	desc, _ := c.GetPostForm("desc")
+	fmt.Println(desc)
 	title, _ := c.GetPostForm("title")
 	isPublicStr, _ := c.GetPostForm("isPublic")
 	ispublic, _ := strconv.ParseBool(isPublicStr)
 	if err == nil {
 		photoInfo := model.Photo{
-			Path:        dst,
+			Path:        htmpPath,
 			UserId:      userId,
 			CreatedAt:   time.Now(),
 			Description: desc,

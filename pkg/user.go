@@ -41,6 +41,10 @@ func getUserInfo(c *gin.Context) {
 	}}}}})
 }
 
+func logout(c *gin.Context) {
+
+}
+
 func login(c *gin.Context) {
 	loginInfo := model.LoginInfo{}
 	if c.ShouldBindJSON(&loginInfo) == nil {
@@ -75,7 +79,7 @@ func register(c *gin.Context) {
 func authMiddleware(c *gin.Context) {
 	tokenString := c.GetHeader("Access-Token")
 	if tokenString == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not found auth header"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Not found auth header"})
 		c.Abort()
 		return
 	}
