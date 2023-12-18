@@ -33,7 +33,7 @@ func getPhotosByUserId(c *gin.Context) {
 func uploadPhoto(c *gin.Context) {
 	var userId int64
 	if user, ok := c.Get(claimsKey); !ok {
-		c.String(500, "请登录")
+		c.String(401, "请登录")
 		c.Abort()
 	} else {
 		userId = user.(Claims).Id
@@ -96,6 +96,22 @@ func newPhoto(c *gin.Context) {
 			c.String(500, err.Error())
 		}
 
+	}
+
+}
+
+func deletePhoto(c *gin.Context) {
+	if photoIdStr, got := c.Params.Get("id"); got {
+		photoId, _ := strconv.ParseInt(photoIdStr, 0, 64)
+		if err := service.DeletePhoto(c.Request.Context(), photoId); err != nil {
+			if err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.String(200, "success")
+			}
+		}
+	} else {
+		c.String(500, "missing phtoto id")
 	}
 
 }

@@ -23,7 +23,7 @@ func NewPhoto(ctx context.Context, photoInfo model.Photo) (model.Photo, error) {
 
 func GetPhotosByUserId(ctx context.Context, userId int64) ([]model.PhotoDTO, error) {
 	returning := make([]model.PhotoDTO, 0)
-	query := "select id,user_id,title,path,description,is_public from pps.photo where user_id=?"
+	query := "select id,user_id,title,path,description,is_public from pps.photo where deleted=false and user_id=?"
 	rows, err := store.DB.QueryContext(ctx, query, userId)
 	if err != nil {
 		return returning, err
@@ -36,4 +36,11 @@ func GetPhotosByUserId(ctx context.Context, userId int64) ([]model.PhotoDTO, err
 	}
 
 	return returning, nil
+}
+
+func DeletePhoto(ctx context.Context, photoId int64) error {
+	sql := "update pps.photo set deleted=true where id =?"
+
+	_, err := store.DB.ExecContext(ctx, sql, photoId)
+	return err
 }
