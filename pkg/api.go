@@ -22,6 +22,8 @@ func Run() {
 
 	api.GET("/user/info", authMiddleware, getUserInfo)
 	api.GET("/user/:id/photos", authMiddleware, getPhotosByUserId)
+
+	api.POST("/photos", getAllPhotos)
 	api.POST("/photo", authMiddleware, newPhoto)
 	api.POST("/photo/upload", authMiddleware, uploadPhoto)
 	api.DELETE("/photo/:id", authMiddleware, deletePhoto)

@@ -14,16 +14,31 @@ import (
 )
 
 // var phtotPath = "d:\\"
-var photoPath = "G:/workspace/node/photo-share-web/public/photo"
+// var photoPath = "G:/workspace/node/photo-share-web/public/photo"
 var viewPath = "/photo"
 
-// var photoPath = "E:\\workspace\\node\\photo-share\\src\\assets\\photo"
+var photoPath = "E:/workspace/node/photo-share/public/photo"
+
+func getAllPhotos(c *gin.Context) {
+	query := model.PageQuery{
+		OrderBy:  "created_at",
+		Page:     1,
+		PageSize: 6,
+	}
+	c.ShouldBind(&query)
+	if photos, total, err := service.GetPublicPhotos(c.Request.Context(), query.OrderBy, (query.Page-1)*query.PageSize, query.PageSize); err != nil {
+		c.String(500, err.Error())
+	} else {
+		c.JSON(200, gin.H{"total": total, "data": photos})
+	}
+}
 
 func getPhotosByUserId(c *gin.Context) {
 	if userId, found := getUserId(c); found {
 		photos, err := service.GetPhotosByUserId(c.Request.Context(), userId)
 		if err != nil {
 			c.String(500, err.Error())
+
 		} else {
 			c.JSON(200, photos)
 		}
