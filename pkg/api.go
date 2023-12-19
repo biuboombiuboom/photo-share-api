@@ -27,6 +27,8 @@ func Run() {
 	api.POST("/photo", authMiddleware, newPhoto)
 	api.POST("/photo/upload", authMiddleware, uploadPhoto)
 	api.DELETE("/photo/:id", authMiddleware, deletePhoto)
+	api.POST("/photo/:id/star", authMiddleware, starPhoto)
+	api.POST("/photo/:id/collect", authMiddleware, collectPhoto)
 
 	api.POST("/message", authMiddleware, newMessage)
 	r.Run()
@@ -43,4 +45,20 @@ func getUserId(c *gin.Context) (int64, bool) {
 		found = true
 	}
 	return userId, found
+}
+
+func getUserIdAndName(c *gin.Context) (int64, string, bool) {
+	found := false
+	var userId int64
+	var username string
+	if user, ok := c.Get(claimsKey); !ok {
+		c.String(500, "请登录")
+		c.Abort()
+	} else {
+		userId = user.(Claims).Id
+		username = user.(Claims).Username
+		found = true
+	}
+	return userId, username, found
+
 }

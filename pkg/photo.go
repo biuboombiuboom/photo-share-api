@@ -14,10 +14,57 @@ import (
 )
 
 // var phtotPath = "d:\\"
-// var photoPath = "G:/workspace/node/photo-share-web/public/photo"
-var viewPath = "/photo"
 
-var photoPath = "E:/workspace/node/photo-share/public/photo"
+var viewPath = "/photo"
+var photoPath = "G:/workspace/node/photo-share-web/public/photo"
+
+// var photoPath = "E:/workspace/node/photo-share/public/photo"
+
+func collectPhoto(c *gin.Context) {
+	if userId, username, found := getUserIdAndName(c); !found {
+		return
+	} else {
+		if pidStr, got := c.Params.Get("id"); !got {
+			c.String(500, "miss photo id")
+		} else {
+			photoId, _ := strconv.ParseInt(pidStr, 0, 64)
+			photo_collect := model.PhotoCollect{
+				PhotoId:   photoId,
+				UserId:    userId,
+				UserName:  username,
+				CreatedAt: time.Now(),
+			}
+			if rows, err := service.CollectPhoto(c.Request.Context(), photo_collect); err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.JSON(200, gin.H{"message": "success", "rows": rows})
+			}
+		}
+	}
+}
+
+func starPhoto(c *gin.Context) {
+	if userId, username, found := getUserIdAndName(c); !found {
+		return
+	} else {
+		if pidStr, got := c.Params.Get("id"); !got {
+			c.String(500, "miss photo id")
+		} else {
+			photoId, _ := strconv.ParseInt(pidStr, 0, 64)
+			photoStar := model.PhotoStar{
+				PhotoId:   photoId,
+				UserId:    userId,
+				UserName:  username,
+				CreatedAt: time.Now(),
+			}
+			if rows, err := service.StarPhoto(c.Request.Context(), photoStar); err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.JSON(200, gin.H{"message": "success", "rows": rows})
+			}
+		}
+	}
+}
 
 func getAllPhotos(c *gin.Context) {
 	query := model.PageQuery{
