@@ -8,12 +8,12 @@ import (
 
 var DB *sql.DB
 
-// var host = "192.168.139.129"
+var host = "192.168.139.129"
 
-var host = "192.168.220.129"
+// var host = "192.168.220.129"
 
 func init() {
-	conn, err := sql.Open("mysql", "root:123456@tcp("+host+":3306)/pps")
+	conn, err := sql.Open("mysql", "root:123456@tcp("+host+":3306)/pps?parseTime=true")
 	if err != nil {
 
 		panic(err)

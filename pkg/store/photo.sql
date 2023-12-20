@@ -42,3 +42,4 @@ CREATE TABLE IF NOT EXISTS pps.photo_star(
 
 alter table pps.photo_star add unique index photo_userid (user_id,photo_id);
 alter table pps.photo_collect add unique index photo_userid (user_id,photo_id);
+alter table pps.comment modify column content text CHARACTER SET utf8mb4 not NULL

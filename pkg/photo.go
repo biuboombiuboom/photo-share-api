@@ -17,17 +17,26 @@ import (
 
 var viewPath = "/photo"
 
-// var photoPath = "G:/workspace/node/photo-share-web/public/photo"
+var photoPath = "G:/workspace/node/photo-share-web/public/photo"
 
-var photoPath = "E:/workspace/node/photo-share/public/photo"
+// var photoPath = "E:/workspace/node/photo-share/public/photo"
 
 func newPhotoComment(c *gin.Context) {
-	comment := model.PhotoComment{}
-	if err := c.BindJSON(&comment); err != nil {
-		c.JSON(400, "bad request")
-		c.Abort()
-	} else {
-
+	if userId, userName, f := getUserIdAndName(c); f {
+		comment := model.PhotoComment{}
+		if err := c.ShouldBind(&comment); err != nil {
+			c.String(400, "bad request:"+err.Error())
+			c.Abort()
+		} else {
+			comment.UserId = userId
+			comment.UserName = userName
+			comment.CreatedAt = time.Now()
+			if err := service.NewComment(c.Request.Context(), comment); err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.String(200, "success")
+			}
+		}
 	}
 }
 

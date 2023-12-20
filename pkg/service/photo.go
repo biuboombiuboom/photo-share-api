@@ -48,7 +48,7 @@ func GetComments(ctx context.Context, id int64) ([]model.PhotoComment, error) {
 	defer rows.Close()
 	for rows.Next() {
 		comment := model.PhotoComment{}
-		if err := rows.Scan(&comment.Id, &comment.UserId, &comment.UserName, &comment.CreatedAt); err != nil {
+		if err := rows.Scan(&comment.Id, &comment.UserId, &comment.UserName, &comment.CreatedAt, &comment.Content); err != nil {
 			return comments, err
 		}
 		comments = append(comments, comment)
