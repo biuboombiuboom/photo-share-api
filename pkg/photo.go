@@ -16,9 +16,54 @@ import (
 // var phtotPath = "d:\\"
 
 var viewPath = "/photo"
-var photoPath = "G:/workspace/node/photo-share-web/public/photo"
 
-// var photoPath = "E:/workspace/node/photo-share/public/photo"
+// var photoPath = "G:/workspace/node/photo-share-web/public/photo"
+
+var photoPath = "E:/workspace/node/photo-share/public/photo"
+
+func newPhotoComment(c *gin.Context) {
+	comment := model.PhotoComment{}
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(400, "bad request")
+		c.Abort()
+	} else {
+
+	}
+}
+
+func getPhotoComments(c *gin.Context) {
+	if pidStr, got := c.Params.Get("id"); !got {
+		c.String(500, "miss photo id")
+	} else {
+		if photoId, err := strconv.ParseInt(pidStr, 0, 64); err != nil {
+			c.String(500, fmt.Sprintf("invaild photoid %s", pidStr))
+		} else {
+			comments, err := service.GetComments(c.Request.Context(), photoId)
+			if err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.JSON(200, comments)
+			}
+		}
+	}
+}
+
+func getPhoto(c *gin.Context) {
+	if pidStr, got := c.Params.Get("id"); !got {
+		c.String(500, "miss photo id")
+	} else {
+		if photoId, err := strconv.ParseInt(pidStr, 0, 64); err != nil {
+			c.String(500, fmt.Sprintf("invaild photoid %s", pidStr))
+		} else {
+			photo, err := service.GetPhoto(c.Request.Context(), photoId)
+			if err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.JSON(200, photo)
+			}
+		}
+	}
+}
 
 func collectPhoto(c *gin.Context) {
 	if userId, username, found := getUserIdAndName(c); !found {

@@ -43,16 +43,17 @@ type PhotoStar struct {
 }
 
 type PhotoDTO struct {
-	Id          int64  `json:"id"`
-	UserId      int64  `json:"userId"`
-	UserName    string `json:"username"`
-	Path        string `json:"path"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	IsPublic    bool   `json:"isPublic"`
-	Star        int64  `json:"star"`
-	Like        int64  `json:"like"`
-	Comment     int64  `json:"comment"`
+	Id          int64          `json:"id"`
+	UserId      int64          `json:"userId"`
+	UserName    string         `json:"username"`
+	Path        string         `json:"path"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	IsPublic    bool           `json:"isPublic"`
+	Star        int64          `json:"star"`
+	Like        int64          `json:"like"`
+	Comment     int64          `json:"comment"`
+	Comments    []PhotoComment `json:"comments"`
 }
 
 type PageQuery struct {

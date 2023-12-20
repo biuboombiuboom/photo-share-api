@@ -9,6 +9,68 @@ import (
 	"photo.share/pkg/store"
 )
 
+func NewComment(ctx context.Context, comment model.PhotoComment) error {
+	tx, err := store.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	sql := "insert into pps.comment(user_id,username,photo_id,created_at,Content)	value(?,?,?,?,?)"
+
+	args := []interface{}{comment.UserId, comment.UserName, comment.PhotoId, time.Now(), comment.Content}
+	_, err = tx.ExecContext(ctx, sql, args...)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	updateCommentQuery := "update pps.photo set comment=comment+1 where id=?"
+	result, err := tx.ExecContext(ctx, updateCommentQuery, comment.PhotoId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil || rows != 1 {
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	return err
+}
+
+func GetComments(ctx context.Context, id int64) ([]model.PhotoComment, error) {
+	comments := make([]model.PhotoComment, 0)
+	commentsQuery := "select id,user_id,username,created_at,content from pps.comment where photo_id=?"
+	rows, err := store.DB.QueryContext(ctx, commentsQuery, id)
+	if err != nil {
+		return comments, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		comment := model.PhotoComment{}
+		if err := rows.Scan(&comment.Id, &comment.UserId, &comment.UserName, &comment.CreatedAt); err != nil {
+			return comments, err
+		}
+		comments = append(comments, comment)
+
+	}
+	return comments, nil
+}
+
+func GetPhoto(ctx context.Context, id int64) (model.PhotoDTO, error) {
+	photo := model.PhotoDTO{}
+	query := "select p.id,p.user_id,u.username,p.title,p.path,p.description,p.star,p.collect,p.comment from pps.photo as p inner join pps.user as u on p.user_id=u.id  where p.id =?"
+	row := store.DB.QueryRowContext(ctx, query, id)
+
+	if err := row.Err(); err != nil {
+		return photo, err
+	}
+
+	err := row.Scan(&photo.Id, &photo.UserId, &photo.UserName, &photo.Title, &photo.Path, &photo.Description, &photo.Star, &photo.Like, &photo.Comment)
+	return photo, err
+
+}
+
 func StarPhoto(ctx context.Context, star model.PhotoStar) (int, error) {
 	tx, err := store.DB.Begin()
 	if err != nil {
