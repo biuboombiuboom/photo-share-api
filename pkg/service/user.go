@@ -65,3 +65,25 @@ func NewUser(ctx context.Context, user model.User) (int64, error) {
 	}
 	return result.LastInsertId()
 }
+
+func UpdatePassword(ctx context.Context, id int64, oldPassword, newPassword string) error {
+	sql := "update pps.user set password=? where id=? and password=?"
+	args := []interface{}{newPassword, oldPassword, id}
+	r, err := store.DB.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+	if rows, err := r.RowsAffected(); err != nil {
+		return err
+	} else if rows != 1 {
+		return errors.New("请输入正确的原始密码")
+	}
+	return nil
+}
+
+func UpdateUserSetting(ctx context.Context, userSetting model.UserSetting) error {
+	sql := "update pps.user set nickname=?,adress=?,description=? where id=?"
+	args := []interface{}{userSetting.Nickname, userSetting.Address, userSetting.Description, userSetting.Id}
+	_, err := store.DB.ExecContext(ctx, sql, args...)
+	return err
+}

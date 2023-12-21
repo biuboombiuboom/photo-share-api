@@ -18,6 +18,7 @@ func Run() {
 
 	auth := api.Group("/auth")
 	auth.POST("/login", login)
+	auth.POST("/logout", logout)
 	auth.POST("/register", register)
 
 	api.GET("/user/info", authMiddleware, getUserInfo)

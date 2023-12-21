@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -19,30 +18,43 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func getUserInfo(c *gin.Context) {
-	// userInfo := model.User{}
+func updatePassword(c *gin.Context) {
+	if userId, found := getUserId(c); found {
+		password := model.PasswordUpdate{}
+		if err := c.ShouldBindJSON(&password); err == nil {
+			if err := service.UpdatePassword(c.Request.Context(), userId, password.OldPassword, password.NewPassword); err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.String(200, "success")
+			}
+		} else {
+			c.String(500, err.Error())
+		}
+	}
+}
 
-	// if c.ShouldBindJSON(&loginInfo) == nil {
-	// 	if user, err := service.Login(c.Request.Context(), loginInfo.Login, loginInfo.Password); err == nil {
-	// 		token, err := createToken(user.UserName)
-	// 		if err != nil {
-	// 			c.JSON(500, gin.H{"error": "Internal Server Error"})
-	// 			return
-	// 		}
-	// 		c.JSON(http.StatusOK, gin.H{"result": userInfo})
-	// 	} else {
-	// 		c.String(500, err.Error())
-	// 	}
-	// } else {
-	// 	c.String(400, "非法的登录信息")
-	// }
+func updateSetting(c *gin.Context) {
+	userSetting := model.UserSetting{}
+	if err := c.ShouldBindJSON(&userSetting); err == nil {
+		if err := service.UpdateUserSetting(c.Request.Context(), userSetting); err != nil {
+			c.String(500, err.Error())
+		} else {
+			c.String(200, "success")
+		}
+	} else {
+		c.String(500, err.Error())
+	}
+}
+
+func getUserInfo(c *gin.Context) {
+
 	c.JSON(http.StatusOK, gin.H{"result": gin.H{"username": "aaa", "role": gin.H{"permissions": []gin.H{{
 		"roleId": "admin", "permissionId": "support", "permissionName": "",
 	}}}}})
 }
 
 func logout(c *gin.Context) {
-
+	c.String(200, "logout")
 }
 
 func login(c *gin.Context) {
@@ -109,7 +121,7 @@ func createToken(userid int64, username string) (string, error) {
 		Username: username,
 		Id:       userid,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(1 * time.Hour).Unix(),
+			ExpiresAt: 0,
 			Issuer:    "202312071026",
 		},
 	}
