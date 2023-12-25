@@ -11,6 +11,10 @@ import (
 	"photo.share/pkg/store"
 )
 
+func GetUserStatisticsByUserId(ctx context.Context, userid int64) (model.User, int64, error) {
+	return model.User{}, 0, nil
+}
+
 func Login(ctx context.Context, login string, pwd string) (model.User, error) {
 	// hash := md5.Sum([]byte(pwd))
 	encodePwd := pwd

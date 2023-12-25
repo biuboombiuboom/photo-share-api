@@ -23,6 +23,8 @@ func Run() {
 
 	api.GET("/user/info", authMiddleware, getUserInfo)
 	api.GET("/user/:id/photos", authMiddleware, getPhotosByUserId)
+	api.GET("/user/v/:userid/photos", authMiddleware, getPhotosByUserId0)
+	api.GET("/user/v/:userid", authMiddleware, getStatisticsByUserId)
 	api.POST("/user/setting", authMiddleware, updateSetting)
 	api.POST("user/updatepwd", authMiddleware, updatePassword)
 

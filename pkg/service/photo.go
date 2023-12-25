@@ -144,6 +144,32 @@ func CollectPhoto(ctx context.Context, collect model.PhotoCollect) (int, error) 
 	return 1, nil
 }
 
+func GetUserPublicPhotos(ctx context.Context, userId int64, orderby string, limit0, limit1 int64) ([]model.PhotoDTO, int, error) {
+	total := 0
+	returning := make([]model.PhotoDTO, 0)
+
+	query := "select count(1) from pps.photo where is_public=true and deleted=false and p.user_id=?"
+
+	row := store.DB.QueryRowContext(ctx, query, userId)
+	if err := row.Scan(&total); err != nil {
+		return returning, total, err
+	}
+
+	sql := fmt.Sprintf("select p.id,p.path,p.title,p.description, p.user_id,u.username,p.star,p.collect,p.comment from pps.photo as p inner join pps.user as u on p.user_id=u.id where p.is_public=true and p.user_id=? and p.deleted=false order by p.%s desc limit %d,%d", orderby, limit0, limit1)
+	rows, err := store.DB.QueryContext(ctx, sql, userId)
+	if err != nil {
+		return returning, total, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		p := model.PhotoDTO{}
+		rows.Scan(&p.Id, &p.Path, &p.Title, &p.Description, &p.UserId, &p.UserName, &p.Star, &p.Like, &p.Comment)
+		returning = append(returning, p)
+	}
+
+	return returning, total, nil
+}
+
 func GetPublicPhotos(ctx context.Context, orderby string, limit0, limit1 int64) ([]model.PhotoDTO, int, error) {
 	total := 0
 	returning := make([]model.PhotoDTO, 0)
@@ -182,6 +208,23 @@ func NewPhoto(ctx context.Context, photoInfo model.Photo) (model.Photo, error) {
 
 	photoInfo.Id, err = result.LastInsertId()
 	return photoInfo, err
+}
+
+func GetPhotosByUsername(ctx context.Context, username int64) ([]model.PhotoDTO, error) {
+	returning := make([]model.PhotoDTO, 0)
+	query := "select id,user_id,title,path,descriptionfrom pps.photo where deleted=false and is_public=true and username=?"
+	rows, err := store.DB.QueryContext(ctx, query, username)
+	if err != nil {
+		return returning, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		p := model.PhotoDTO{}
+		rows.Scan(&p.Id, &p.UserId, &p.Title, &p.Path, &p.Description)
+		returning = append(returning, p)
+	}
+
+	return returning, nil
 }
 
 func GetPhotosByUserId(ctx context.Context, userId int64) ([]model.PhotoDTO, error) {

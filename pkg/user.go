@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -16,6 +17,18 @@ type Claims struct {
 	Id       int64  `json:"id"`
 	Username string `json:"username"`
 	jwt.StandardClaims
+}
+
+func getStatisticsByUserId(c *gin.Context) {
+	if useridstr, got := c.Params.Get("userid"); got {
+		if userid, err := strconv.ParseInt(useridstr, 0, 64); err == nil {
+			service.GetUserStatisticsByUserId(c.Request.Context(), userid)
+		} else {
+			c.String(500, "invaild user id")
+		}
+	} else {
+		c.String(500, "missing user id")
+	}
 }
 
 func updatePassword(c *gin.Context) {

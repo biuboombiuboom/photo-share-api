@@ -120,6 +120,33 @@ func starPhoto(c *gin.Context) {
 	}
 }
 
+func getPhotosByUserId0(c *gin.Context) {
+	query := model.PageQuery{
+		OrderBy:  "created_at",
+		Page:     1,
+		PageSize: 6,
+	}
+	if err := c.ShouldBind(&query); err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	if userIdStr, got := c.Params.Get("userid"); !got {
+		c.String(500, "miss user id")
+		return
+	} else {
+		if userId, err := strconv.ParseInt(userIdStr, 0, 64); err != nil {
+			c.String(500, "miss user id")
+		} else {
+			if photos, total, err := service.GetUserPublicPhotos(c.Request.Context(), userId, query.OrderBy, (query.Page-1)*query.PageSize, query.PageSize); err != nil {
+				c.String(500, err.Error())
+			} else {
+				c.JSON(200, gin.H{"total": total, "data": photos})
+			}
+		}
+	}
+
+}
+
 func getAllPhotos(c *gin.Context) {
 	query := model.PageQuery{
 		OrderBy:  "created_at",
