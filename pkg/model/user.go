@@ -1,10 +1,13 @@
 package model
 
 type User struct {
-	Id       int64  `json:"id"`
-	UserName string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Id          int64  `json:"id"`
+	UserName    string `json:"username"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Nickname    string `json:"nickname"`
+	Address     string `json:"address"`
+	Description string `json:"description"`
 }
 
 type LoginInfo struct {

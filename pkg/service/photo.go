@@ -155,7 +155,7 @@ func GetPublicPhotos(ctx context.Context, orderby string, limit0, limit1 int64) 
 		return returning, total, err
 	}
 
-	sql := fmt.Sprintf("select p.id,p.path,p.title,p.description, p.user_id,u.username,p.star,p.collect from pps.photo as p inner join pps.user as u on p.user_id=u.id where p.is_public=true and p.deleted=false order by p.%s desc limit %d,%d", orderby, limit0, limit1)
+	sql := fmt.Sprintf("select p.id,p.path,p.title,p.description, p.user_id,u.username,p.star,p.collect,p.comment from pps.photo as p inner join pps.user as u on p.user_id=u.id where p.is_public=true and p.deleted=false order by p.%s desc limit %d,%d", orderby, limit0, limit1)
 	rows, err := store.DB.QueryContext(ctx, sql)
 	if err != nil {
 		return returning, total, err
@@ -163,7 +163,7 @@ func GetPublicPhotos(ctx context.Context, orderby string, limit0, limit1 int64) 
 	defer rows.Close()
 	for rows.Next() {
 		p := model.PhotoDTO{}
-		rows.Scan(&p.Id, &p.Path, &p.Title, &p.Description, &p.UserId, &p.UserName, &p.Star, &p.Like)
+		rows.Scan(&p.Id, &p.Path, &p.Title, &p.Description, &p.UserId, &p.UserName, &p.Star, &p.Like, &p.Comment)
 		returning = append(returning, p)
 	}
 
@@ -171,9 +171,9 @@ func GetPublicPhotos(ctx context.Context, orderby string, limit0, limit1 int64) 
 }
 
 func NewPhoto(ctx context.Context, photoInfo model.Photo) (model.Photo, error) {
-	query := "insert into pps.photo(user_id,path,created_at,description,title,is_public,deleted) value(?,?,?,?,?,?,?)"
+	query := "insert into pps.photo(user_id,path,created_at,description,title,is_public,deleted,star,collect,comment) value(?,?,?,?,?,?,?,?,?,?)"
 	args := make([]interface{}, 0)
-	args = append(args, photoInfo.UserId, photoInfo.Path, photoInfo.CreatedAt, photoInfo.Description, photoInfo.Title, photoInfo.IsPublic, false)
+	args = append(args, photoInfo.UserId, photoInfo.Path, photoInfo.CreatedAt, photoInfo.Description, photoInfo.Title, photoInfo.IsPublic, false, 0, 0, 0)
 
 	result, err := store.DB.ExecContext(ctx, query, args...)
 	if err != nil {

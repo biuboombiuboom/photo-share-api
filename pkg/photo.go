@@ -203,6 +203,9 @@ func newPhoto(c *gin.Context) {
 			Description: desc,
 			Title:       title,
 			IsPublic:    ispublic,
+			Star:        0,
+			Like:        0,
+			Comment:     0,
 		}
 		_, err := service.NewPhoto(c.Request.Context(), photoInfo)
 		if err == nil {

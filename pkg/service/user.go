@@ -18,7 +18,7 @@ func Login(ctx context.Context, login string, pwd string) (model.User, error) {
 	user := model.User{}
 	empty := model.User{}
 
-	sql := "select id,username,email,password from pps.user where (username=? or email=?)"
+	sql := "select id,username,nickname,address,description,email,password from pps.user where (username=? or email=?)"
 	args := make([]interface{}, 0)
 	args = append(args, login, login)
 
@@ -28,7 +28,7 @@ func Login(ctx context.Context, login string, pwd string) (model.User, error) {
 		return user, err
 	}
 	var userPassword string
-	row.Scan(&user.Id, &user.UserName, &user.Email, &userPassword)
+	row.Scan(&user.Id, &user.UserName, &user.Nickname, &user.Address, &user.Description, &user.Email, &userPassword)
 	if encodePwd == userPassword {
 		return user, nil
 	} else {
@@ -82,7 +82,7 @@ func UpdatePassword(ctx context.Context, id int64, oldPassword, newPassword stri
 }
 
 func UpdateUserSetting(ctx context.Context, userSetting model.UserSetting) error {
-	sql := "update pps.user set nickname=?,adress=?,description=? where id=?"
+	sql := "update pps.user set nickname=?,address=?,description=? where id=?"
 	args := []interface{}{userSetting.Nickname, userSetting.Address, userSetting.Description, userSetting.Id}
 	_, err := store.DB.ExecContext(ctx, sql, args...)
 	return err

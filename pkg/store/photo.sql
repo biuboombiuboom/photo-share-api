@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS  pps.photo(
     id BIGINT PRIMARY KEY AUTO_INCREMENT,user_id BIGINT,
     title VARCHAR(100) ,
     path VARCHAR(500) NOT NULL,
-    description VARCHAR(50),
+    description VARCHAR(500),
     is_public BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -48,3 +48,7 @@ alter table pps.user add column nickname nvarchar(50) DEFAULT '';
 alter table pps.user add unique index idx_email(email);
 alter table pps.user add unique index idx_user(username);
 alter table pps.user add column  description nvarchar(2000) default '';
+
+
+alter table pps.photo modify title VARCHAR(100) CHARACTER SET utf8mb4 not NULL default '';
+alter table pps.photo modify description VARCHAR(500) CHARACTER SET utf8mb4 not NULL default ''；
